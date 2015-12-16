@@ -2,12 +2,12 @@ package com.watb.data;
 
 public class ToDoHandlerFactory {
 
-    public enum ToDoHanlerType { SQLITE, JSON }
+    public enum ToDoHandlerType { SQLITE, JSON }
 
     public ToDoHandlerFactory() {
     }
 
-    public IToDoHandler getToDoHandler(ToDoHanlerType type)
+    public IToDoHandler getToDoHandler(ToDoHandlerType type)
     {
         switch (type)
         {
