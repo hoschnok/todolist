@@ -98,10 +98,4 @@ public class DataTest {
 
     }
 
-    public static void main( String args[] )
-    {
-        DataTest test = new DataTest();
-        //test.sqliteTest();
-        test.jsonTest();
-    }
 }
