@@ -50,6 +50,6 @@ public class ToDoList {
 
     @Override
     public String toString() {
-        return "ToDoList{id=" + id + ", name='" + name + '\'' + ", Listenlänge=" + toDoList.size() + '}';
+        return getName();
     }
 }
