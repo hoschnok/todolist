@@ -40,6 +40,6 @@ public interface IToDoHandler {
      * @param todo_id
      *          ID des abgehakten Tasks
      */
-    void toDoIsDone(long todo_id);
+    void changeDoneStatus(long todo_id, boolean status);
 
 }

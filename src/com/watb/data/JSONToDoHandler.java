@@ -141,7 +141,7 @@ public class JSONToDoHandler implements IToDoHandler
 	 *          ID des abgehakten Tasks
 	 */
 	@Override
-	public void toDoIsDone(long todo_id) {
+	public void changeDoneStatus(long todo_id, boolean status) {
 
 		JSONArray base = null;
 		try {
@@ -157,7 +157,7 @@ public class JSONToDoHandler implements IToDoHandler
 						int id = toIntExact((long) task.get("id"));
 						if (id == todo_id)
 						{
-							task.replace("done", true);
+							task.replace("done", status);
 							ids.set(j, task);
 							json.replace("task_list", ids);
 							base.set(i, json);

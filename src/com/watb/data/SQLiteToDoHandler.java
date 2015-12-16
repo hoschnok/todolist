@@ -123,7 +123,7 @@ public class SQLiteToDoHandler implements IToDoHandler
      *          ID des abgehakten Tasks
      */
     @Override
-    public void toDoIsDone(long todo_id) {
+    public void changeDoneStatus(long todo_id, boolean status) {
         DBConnection dbc = new DBConnection();
 
         Connection c = null;
@@ -131,7 +131,7 @@ public class SQLiteToDoHandler implements IToDoHandler
 
         try {
             c = dbc.connect();
-            stmt = c.prepareStatement("Update ToDo SET done = 1 WHERE id = ?");
+            stmt = c.prepareStatement("Update ToDo SET done = " + status + " WHERE id = ?");
             stmt.setLong(1, todo_id);
             stmt.executeUpdate();
         }

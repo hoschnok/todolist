@@ -39,8 +39,8 @@ public class DataTest {
             System.out.println(td.toString());
         }
 
-        handler.toDoIsDone(haushalt.getToDoList().get(2).getId());
-        handler.toDoIsDone(haushalt.getToDoList().get(0).getId());
+        handler.changeDoneStatus(haushalt.getToDoList().get(2).getId(), true);
+        handler.changeDoneStatus(haushalt.getToDoList().get(0).getId(), false);
         haushalt = handler.setToDoList(lists.get(1));
         System.out.println(haushalt.toString());
         for (ToDo td : haushalt.getToDoList()) {
@@ -85,8 +85,8 @@ public class DataTest {
 
         System.out.println("-----------------------------------------------------------");
 
-        handler.toDoIsDone(2);
-        handler.toDoIsDone(4);
+        handler.changeDoneStatus(2, true);
+        handler.changeDoneStatus(4, false);
 
         for (ToDoList list : handler.getLists()) {
             System.out.println(list.toString());
