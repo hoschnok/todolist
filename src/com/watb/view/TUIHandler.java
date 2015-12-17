@@ -1,7 +1,7 @@
 package com.watb.view;
 
 import com.watb.data.IToDoHandler;
-import com.watb.data.JSONToDoHandler;
+
 import com.watb.data.ToDoHandlerFactory;
 import com.watb.model.ToDo;
 import com.watb.model.ToDoList;
