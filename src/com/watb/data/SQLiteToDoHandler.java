@@ -3,6 +3,7 @@ package com.watb.data;
 import com.watb.model.ToDo;
 import com.watb.model.ToDoList;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,7 +23,8 @@ public class SQLiteToDoHandler implements IToDoHandler
      *              Name der neuen Liste
      */
     @Override
-    public void saveToDoList(String list_name) {
+    public void saveToDoList(String list_name)
+    {
         DBConnection dbc = new DBConnection();
 
         Connection c = null;
