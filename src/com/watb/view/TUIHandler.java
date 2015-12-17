@@ -33,8 +33,14 @@ public class TUIHandler {
         System.out.println(" *** TODO LIST APP - Text User Interface ***");
     }
 
+    private void printOutro() {
+        System.out.println("\nProgramm beendet.");
+        System.out.println(" *** TODO LIST APP - by Jahns, Reim, Wagner ***");
+    }
+
     private void listTodoListMenu() {
         System.out.println("neue Liste [n]\n");
+        System.out.println("Programm beenden [exit]\n");
         System.out.println("Wählen Sie eine der ToDo Listen aus oder erstellen Sie eine neue.");
         System.out.print("-> ");
         String input = scanner.next().trim();
@@ -43,10 +49,13 @@ public class TUIHandler {
                 long listId = Long.parseLong(input);
                 listTasks(listId);
             } catch (NumberFormatException nfe) {
-                if (input.equals("n")) {
+                if (input.equalsIgnoreCase("n")) {
                     System.out.println("Geben Sie den Namen der neuen Liste ein.");
                     System.out.print("-> ");
+                    toDoHandler.saveToDoList(scanner.next().trim());
                     listTodoLists();
+                } else if (input.equalsIgnoreCase("exit")) {
+                    printOutro();
                 } else {
                     System.out.println("Falsche Eingabe.");
                     listTodoLists();
@@ -117,9 +126,10 @@ public class TUIHandler {
         }
 
         if (wantedList.getName() != null) {
+            toDoHandler.setToDoList(wantedList);
             ArrayList<ToDo> tasks = wantedList.getToDoList();
             System.out.println("Liste: " + wantedList.getName());
-            if(tasks.isEmpty()){
+            if (tasks.isEmpty()) {
                 System.out.println("! Diese Liste enthält noch keine Aufgaben.");
             }
             for (ToDo task : tasks) {
