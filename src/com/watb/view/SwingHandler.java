@@ -1,6 +1,8 @@
 package com.watb.view;
 
+import com.watb.data.IToDoHandler;
 import com.watb.data.JSONToDoHandler;
+import com.watb.data.ToDoHandlerFactory;
 import com.watb.model.ToDo;
 import com.watb.model.ToDoList;
 import javax.swing.*;
@@ -27,15 +29,20 @@ public class SwingHandler implements ActionListener {
     ArrayList<ToDo> toDos;
     JPanel centerPanel;
     DefaultTableModel defaultTableModel;
-    JSONToDoHandler jsonToDoHandler;
+    IToDoHandler toDoHandler;
     TableModelListener tableModelListener;
+    JButton addNewList;
+    JTextField newList;
+    JPanel header;
 
     /**
      * Initialisiert den tableModelListener. Dieser muss während der Laufzeit der JTable hinzugefügt und teilweise
      * wieder entfernt werden, deshalb initialisieren wir diesen schon vor Erstellung des JFrames.
      */
-    public void init()
+    public void init(String db)
     {
+        ToDoHandlerFactory toDoHandlerFactory = new ToDoHandlerFactory();
+        this.toDoHandler = toDoHandlerFactory.getToDoHandler(db);
         //Eventlistener für Tabelle muss vorher definiert werden, da wir ihn teilweise kurz entfernen müssen
         this.tableModelListener = new TableModelListener() {
             @Override
@@ -53,7 +60,7 @@ public class SwingHandler implements ActionListener {
                 //wir holen uns das betroffene ToDos und ändern den Wert in dem JSON/SQLite
                 ToDo toDo = toDos.get(rowChanged);
                 //change on database level
-                jsonToDoHandler.changeDoneStatus(toDo.getId(), done);
+                toDoHandler.changeDoneStatus(toDo.getId(), done);
                 //if we still want to work with the entities and not refresh from db we have to change them too
                 toDo.setDone(done);
             }
@@ -77,6 +84,8 @@ public class SwingHandler implements ActionListener {
         //erstellt eine JComboBox, welche die aktuellen ToDos-Listen enthält
         this.createComboBox();
 
+        this.createNewListInput();
+
         //erstelle Tabelle mit initial ausgewähltem Wert der ComboBox
         this.createTable();
 
@@ -89,16 +98,31 @@ public class SwingHandler implements ActionListener {
     }
 
     /**
+     * Fügt die benötigten Elemente zum Hinzufügen neuer Listen dem Headerbereich hinzu.
+     */
+    public void createNewListInput()
+    {
+        //Textfeld zum Hinzufügen neuer ToDos-Listen
+        this.newList = new JTextField();
+        //Größe an Elemente JComboBox und JButton in der Reihe anpassen
+        this.newList.setPreferredSize(new Dimension(200, 30));
+        //Button zum hinzufügen der ToDos-Liste
+        this.addNewList = new JButton("Liste hinzufügen");
+        //actionListener des Buttons wieder mit Verweis auf dieses Objekt - permformed action prüft dann das Element
+        this.addNewList.addActionListener(this);
+        //Hinzufügen der Elemente zu dem Header-Bereich
+        this.header.add(newList);
+        this.header.add(addNewList);
+    }
+
+    /**
      * Erzeugt initial unsere JComboBox in der alle derzeitig gespeicherten ToDosListen angezeigt werden.
      * Weiterhin bekommt die ComboxBox einen ActionListener, welcher die Inhalte der Tabelle bei einer Auswahl erneuert.
      */
     public void createComboBox()
     {
-        //Erstelle einen JSONtoDoHandler, um die derzeitigen Einträge der JSON files zu bekommen
-        this.jsonToDoHandler = new JSONToDoHandler();
-
         //Hole alle Listen aus den JSON files, um diese in einem DropDown darstellen zu können
-        this.toDoLists = jsonToDoHandler.getLists();
+        this.toDoLists = this.toDoHandler.getLists();
 
         //Erstellen einer Combobox für Auswahl einer ToDos-Liste
         this.toDoListComboBox = new JComboBox(toDoLists.toArray());
@@ -107,13 +131,13 @@ public class SwingHandler implements ActionListener {
         this.toDoListComboBox.addActionListener(this);
 
         //JComboBox wird Panel hinzugefügt - FlowLaylout, damit die Inhalte linksbündig angezeigt werden
-        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        this.header = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         //füge die JComboBox dem JPanel hinzu
-        header.add(this.toDoListComboBox);
+        this.header.add(this.toDoListComboBox);
 
         //Bevorzugte Höhe und Breite setzen
-        header.setPreferredSize(new Dimension(200, 50));
+        this.header.setPreferredSize(new Dimension(200, 50));
 
         //Panel hinzufügen (PAGE_START, PAGE_END, LINE_START, LINE_END, CENTER)
         this.frame.getContentPane().add(header, BorderLayout.PAGE_START);
@@ -129,11 +153,19 @@ public class SwingHandler implements ActionListener {
     {
         //Wurde eine ToDoList in der ComboBox ausgewählt, holen wir uns die neue ToDoList
         ToDoList selected = (ToDoList) this.toDoListComboBox.getSelectedItem();
-            /* danach setzen wir die ArrayList der ToDos als Object-Eigenschaft, damit wir daraus eine Tabelle erzeugen
-             können
-              */
+        /* danach setzen wir die ArrayList der ToDos als Object-Eigenschaft, damit wir daraus eine Tabelle erzeugen
+         können*/
+        /*
+         * todos für sqlite müssen mittels setToDoList erneuert werden - für json nicht nötig wird aber wegen
+         * Abstraktion trotzdem getan
+         */
+        this.toDoHandler.setToDoList(selected);
+        //erneure die selektierte ToDos
         this.toDos = selected.getToDoList();
-
+        //do not go on if no Todos
+        if(this.toDos == null){
+            return;
+        }
         this.defaultTableModel = new DefaultTableModel();
         //Spaltennamen bestimmen
         String[] columnNames = {
@@ -200,18 +232,32 @@ public class SwingHandler implements ActionListener {
      */
     public void refreshTable()
     {
-        //remove temprorarly, since else it will trigger on table refresh, which results in an Exception
-        this.defaultTableModel.removeTableModelListener(this.tableModelListener);
-        //entferne alle Reihen die momentan in der Tabelle sind
-        int currentRowCount = this.defaultTableModel.getRowCount();
-        //bevor die Tabelle neu belesen werden kann, müssen alle bisherigen Datensätze aus ihr entfernt werden
-        for (int i = currentRowCount - 1; i >= 0; i--) {
-            this.defaultTableModel.removeRow(i);
+        //do not go on if no Todos
+        if(this.toDos != null){
+            //remove temprorarly, since else it will trigger on table refresh, which results in an Exception
+            this.defaultTableModel.removeTableModelListener(this.tableModelListener);
+            //entferne alle Reihen die momentan in der Tabelle sind
+            int currentRowCount = this.defaultTableModel.getRowCount();
+            //bevor die Tabelle neu belesen werden kann, müssen alle bisherigen Datensätze aus ihr entfernt werden
+            for (int i = currentRowCount - 1; i >= 0; i--) {
+                this.defaultTableModel.removeRow(i);
+            }
         }
+
         //Wurde eine ToDoList in der ComboBox ausgewählt, holen wir uns die neue ToDoList
         ToDoList selected = (ToDoList) this.toDoListComboBox.getSelectedItem();
+        /*
+         * todos für sqlite müssen mittels setToDoList erneuert werden - für json nicht nötig wird aber wegen
+         * Abstraktion trotzdem getan
+         */
+        this.toDoHandler.setToDoList(selected);
         //erneure die selektierte ToDos
         this.toDos = selected.getToDoList();
+
+        //do not go on if no Todos
+        if(this.toDos == null){
+            return;
+        }
 
         //befülle die nun geleerte Tabelle neu
         for (int i = 0; i < this.toDos.size(); i++){
@@ -234,7 +280,8 @@ public class SwingHandler implements ActionListener {
         if(ae.getSource() == this.toDoListComboBox){
             //ernuere die Daten der Tabelle, wenn eine andere ToDos ausgewählt wurden
             this.refreshTable();
+        }else if(ae.getSource() == this.addNewList){
+            System.out.println("x");
         }
-
     }
 }

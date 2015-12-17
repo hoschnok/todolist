@@ -17,7 +17,10 @@ public class ToDoListApp {
     private final static String REGEX_UI_DECLARATION = "(gui|tui)";
 
     public static void main(String[] args) {
+        // gui or tui
         String ui = "";
+        //sqlite or json
+        String db = "";
 
         //Programm-Parameter auswerten (ob null und ob Eingabe anhand der oben definierten Regular Expression korrekt)
         if (ui.equals("")) {
@@ -38,16 +41,16 @@ public class ToDoListApp {
             //Referenz zu der Klasse in der wir uns befinden, da static Notationen wie this nicht zulässt
             SwingHandler swingHandler = new SwingHandler();
             //initialisiert den TableModelListener
-            swingHandler.init();
+            swingHandler.init(db);
             //Erzeugt den Hauptframe mit Auswahl der derzeitigen ToDos-Listen
             swingHandler.createFrame();
         } else if (ui.equals("tui")) {
 
         }
 
-        //erstellt beispielhaft Datensätze in sqlite und json
-        //ToDoListApp app = new com.watb.controller.ToDoListApp();
-        //app.runTest();
+//        //erstellt beispielhaft Datensätze in sqlite und json
+//        ToDoListApp app = new ToDoListApp();
+//        app.runTest();
     }
 
     public void runTest() {
