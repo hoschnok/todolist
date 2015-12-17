@@ -22,7 +22,7 @@ public class TUIHandler {
 
         ToDoHandlerFactory toDoHandlerFactory = new ToDoHandlerFactory();
 
-        toDoHandler = (JSONToDoHandler) toDoHandlerFactory.getToDoHandler(ToDoHandlerFactory.ToDoHandlerType.JSON);
+        toDoHandler = (JSONToDoHandler) toDoHandlerFactory.getToDoHandler("json");
         printIntro();
         listTodoLists();
 
