@@ -1,10 +1,12 @@
 package com.watb.view;
 
+import com.watb.data.IToDoHandler;
 import com.watb.data.JSONToDoHandler;
 import com.watb.data.ToDoHandlerFactory;
 import com.watb.model.ToDo;
 import com.watb.model.ToDoList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,16 +18,15 @@ public class TUIHandler {
     Scanner scanner = new Scanner(System.in);
     private static int maxSpaces = 45;
 
-    JSONToDoHandler toDoHandler;
+    IToDoHandler toDoHandler;
 
-    public void init() {
+    public void init(String db) {
 
         ToDoHandlerFactory toDoHandlerFactory = new ToDoHandlerFactory();
+        this.toDoHandler = toDoHandlerFactory.getToDoHandler(db);
 
-        toDoHandler = (JSONToDoHandler) toDoHandlerFactory.getToDoHandler("json");
         printIntro();
         listTodoLists();
-
     }
 
     private void printIntro() {
@@ -45,7 +46,11 @@ public class TUIHandler {
                 if (input.equals("n")) {
                     System.out.println("Geben Sie den Namen der neuen Liste ein.");
                     System.out.print("-> ");
-                    toDoHandler.saveToDoList(scanner.next().trim());
+                    try {
+                        toDoHandler.saveToDoList(scanner.next().trim());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     listTodoLists();
                 } else {
                     System.out.println("Falsche Eingabe.");
