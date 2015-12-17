@@ -46,11 +46,6 @@ public class TUIHandler {
                 if (input.equals("n")) {
                     System.out.println("Geben Sie den Namen der neuen Liste ein.");
                     System.out.print("-> ");
-                    try {
-                        toDoHandler.saveToDoList(scanner.next().trim());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     listTodoLists();
                 } else {
                     System.out.println("Falsche Eingabe.");

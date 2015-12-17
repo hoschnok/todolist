@@ -12,7 +12,7 @@ public interface IToDoHandler {
      * @param list_name
      *              Name der neuen Liste
      */
-    void saveToDoList(String list_name) throws IOException;
+    void saveToDoList(String list_name);
 
     /**Speichert den neuen Task in der DB
      *

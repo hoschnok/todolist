@@ -18,9 +18,9 @@ public class ToDoListApp {
 
     public static void main(String[] args) {
         // gui or tui
-        String ui = "";
+        String ui = "gui";
         //sqlite or json
-        String db = "";
+        String db = "json";
 
         //Programm-Parameter auswerten (ob null und ob Eingabe anhand der oben definierten Regular Expression korrekt)
         if (ui.equals("")) {
