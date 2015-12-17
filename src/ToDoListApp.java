@@ -13,6 +13,7 @@ public class ToDoListApp implements ActionListener
     JComboBox toDoListComboBox;
     JFrame frame;
     JTable table;
+    ArrayList<ToDoList> toDoLists;
     ArrayList<ToDo> toDos;
     JPanel centerPanel;
     DefaultTableModel defaultTableModel;
@@ -65,7 +66,10 @@ public class ToDoListApp implements ActionListener
                 boolean done = (boolean) value;
                 //wir holen uns das betroffene ToDos und ändern den Wert in dem JSON/SQLite
                 ToDo toDo = toDos.get(rowChanged);
+                //change on database level
                 jsonToDoHandler.changeDoneStatus(toDo.getId(), done);
+                //if we still want to work with the entities and not refresh from db we have to change them too
+                toDo.setDone(done);
             }
         };
     }
@@ -101,7 +105,7 @@ public class ToDoListApp implements ActionListener
         this.jsonToDoHandler = new JSONToDoHandler();
 
         //Hole alle Listen aus den JSON files, um diese in einem DropDown darstellen zu können
-        ArrayList<ToDoList> toDoLists = jsonToDoHandler.getLists();
+         this.toDoLists = jsonToDoHandler.getLists();
 
         //Erstellen einer Combobox für Auswahl einer ToDos-Liste
         this.toDoListComboBox = new JComboBox(toDoLists.toArray());
@@ -158,9 +162,6 @@ public class ToDoListApp implements ActionListener
                 }
             }
         };
-
-        this.defaultTableModel.addTableModelListener(this.tableModelListener);
-
         //scrollable viewport size verkleinern, sonst größer als JFrame
         this.table.setPreferredScrollableViewportSize(new Dimension(400, 100));
 
@@ -178,7 +179,10 @@ public class ToDoListApp implements ActionListener
 
         //füge das Panel dem Borderlayout hinzu (PAGE_START, PAGE_END, LINE_START, LINE_END, CENTER)
         this.frame.getContentPane().add(this.centerPanel, BorderLayout.CENTER);
+
+        this.defaultTableModel.addTableModelListener(this.tableModelListener);
     }
+
 
     public void refreshTable()
     {
