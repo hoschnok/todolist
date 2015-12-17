@@ -1,5 +1,14 @@
 import com.watb.data.*;
 
+/**
+ * Note: "ToDos" Schreibweise wird verwendet, weil IntelliJ ansonsten Kommentare als Aufgaben anzeigt.
+ *
+ * ToDoListApp ermöglicht das Anlegen von ToDosList und einzelnen ToDos (bzw. Tasks) unterhalt der einzelnen Listen.
+ * Jeder task kann dabei als abgeschlossen (done) makiert werden.
+ *
+ * Datenhaltung findet mittels SQLite oder JSON statt.
+ * Bedienung erfolgt derzeit über eine mit Swing erzeugte GUI.
+ */
 public class ToDoListApp
 {
 

@@ -12,6 +12,11 @@ import java.util.ArrayList;
 
 /**
  * Created by Jahns on 17.12.2015.
+ *
+ * Note: "ToDos" Schreibweise wird verwendet, weil IntelliJ ansonsten Kommentare als Aufgaben anzeigt.
+ *
+ * Erzeugt einen JFrame mittels Swing. Dieser ist der einzige Frame den wir derzeit benötigen und beinhaltet eine
+ * JCombobox zur Auswahl der bestehenden ToDosListen und eine JTable mit der jeweiligen ausgewählten ToDosList.
  */
 public class SwingHandler implements ActionListener {
     JComboBox toDoListComboBox;
@@ -24,6 +29,10 @@ public class SwingHandler implements ActionListener {
     JSONToDoHandler jsonToDoHandler;
     TableModelListener tableModelListener;
 
+    /**
+     * Initialisiert den tableModelListener. Dieser muss während der Laufzeit der JTable hinzugefügt und teilweise
+     * wieder entfernt werden, deshalb initialisieren wir diesen schon vor Erstellung des JFrames.
+     */
     public void init()
     {
         //Eventlistener für Tabelle muss vorher definiert werden, da wir ihn teilweise kurz entfernen müssen
@@ -50,6 +59,9 @@ public class SwingHandler implements ActionListener {
         };
     }
 
+    /**
+     * Erstellt unseren Hauptframe mit der JComboBox und der JTable, zur Auswahl von Listen und Darstellung der Tasks.
+     */
     public void createFrame()
     {
         // Erzeugung eines neuen JFrame (Hauptfenster) mit dem Titel "ToDoListApp"
@@ -75,6 +87,10 @@ public class SwingHandler implements ActionListener {
         this.frame.setVisible(true);
     }
 
+    /**
+     * Erzeugt initial unsere JComboBox in der alle derzeitig gespeicherten ToDosListen angezeigt werden.
+     * Weiterhin bekommt die ComboxBox einen ActionListener, welcher die Inhalte der Tabelle bei einer Auswahl erneuert.
+     */
     public void createComboBox()
     {
         //Erstelle einen JSONtoDoHandler, um die derzeitigen Einträge der JSON files zu bekommen
@@ -102,6 +118,12 @@ public class SwingHandler implements ActionListener {
         this.frame.getContentPane().add(header, BorderLayout.PAGE_START);
     }
 
+    /**
+     * Initial muss auch die Tabelle einmal mit der Vorauswahl der JComboBox gefüllt werden. Danach wird lediglich
+     * die Funktion refreshTable() aufegrufen. GetColumnClass() muss überschrieben werden, damit die boolean-Werte
+     * als CheckBo angezeigt werden. Die Tabelle hat zudem einen tableModelListener, mit dem wir erkennen, wenn ein
+     * Task als erledigt makiert wurde und diese Änderung im Model, bzw. in der Datenbank übernommen werden muss.
+     */
     public void createTable()
     {
         //Wurde eine ToDoList in der ComboBox ausgewählt, holen wir uns die neue ToDoList
@@ -112,10 +134,12 @@ public class SwingHandler implements ActionListener {
         this.toDos = selected.getToDoList();
 
         this.defaultTableModel = new DefaultTableModel();
+        //Spaltennamen bestimmen
         String[] columnNames = {
                 "ToDos",
                 "Erledigt"
         };
+        //Zuweisen der Spaltennamen zu unserem defaultTableModel
         this.defaultTableModel.setColumnIdentifiers(columnNames);
 
         //erstelle Tabelle zur Listung der ToDos
@@ -141,6 +165,7 @@ public class SwingHandler implements ActionListener {
         //scrollable viewport size verkleinern, sonst größer als JFrame
         this.table.setPreferredScrollableViewportSize(new Dimension(400, 100));
 
+        //Durchlaufen der einzelnen Task einer Liste und hinzufügen zu unserer Tabelle
         for (int i = 0; i < this.toDos.size(); i++){
             defaultTableModel.addRow(new Object[] { this.toDos.get(i), this.toDos.get(i).isDone() });
         }
@@ -156,14 +181,29 @@ public class SwingHandler implements ActionListener {
         //füge das Panel dem Borderlayout hinzu (PAGE_START, PAGE_END, LINE_START, LINE_END, CENTER)
         this.frame.getContentPane().add(this.centerPanel, BorderLayout.CENTER);
 
+        /*
+         *   Hinzufügen unseres tableModelListeners ganz am Ende, da dieser sonst bereits beim erstmaligen Hinzufügen
+         *   unserer Datensätze jedes mal Triggern würde.
+         *
+         *   Note: muss vor jedem Refresh der Tabelle durch eine Auswahl der JComboBox entfernt werden, damit das
+         *   Event nur eintritt, wenn ein Task als done makiert wird.
+         */
         this.defaultTableModel.addTableModelListener(this.tableModelListener);
     }
 
 
+    /**
+     * Erneuert die Inhalte der Tabelle, wenn der User eine andere Liste aus der JComboBox wählt. Dabei wird vorher
+     * der TableModelListener entfernt, damit das neue Belesen der Tabelle keine Events auslöst und danach wieder
+     * zugewiesen.
+     */
     public void refreshTable()
     {
+        //remove temprorarly, since else it will trigger on table refresh, which results in an Exception
+        this.defaultTableModel.removeTableModelListener(this.tableModelListener);
         //entferne alle Reihen die momentan in der Tabelle sind
         int currentRowCount = this.defaultTableModel.getRowCount();
+        //bevor die Tabelle neu belesen werden kann, müssen alle bisherigen Datensätze aus ihr entfernt werden
         for (int i = currentRowCount - 1; i >= 0; i--) {
             this.defaultTableModel.removeRow(i);
         }
@@ -182,9 +222,13 @@ public class SwingHandler implements ActionListener {
         this.defaultTableModel.addTableModelListener(this.tableModelListener);
     }
 
+    /**
+     * Funktion des ActionListeners. Wird aufegerufen, egal welches Actionevent eintritt. Folglich muss über getSource()
+     * geprüft werden, welches Element betroffen ist.
+     *
+     * @param ae
+     */
     public void actionPerformed (ActionEvent ae){
-        //remove temprorarly, since else it will trigger on table refresh, which results in an Exception
-        this.defaultTableModel.removeTableModelListener(this.tableModelListener);
         //Prüfe welches Element das Event erzeugt hat
         if(ae.getSource() == this.toDoListComboBox){
             //ernuere die Daten der Tabelle, wenn eine andere ToDos ausgewählt wurden
