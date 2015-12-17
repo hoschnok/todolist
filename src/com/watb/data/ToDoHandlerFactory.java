@@ -9,8 +9,8 @@ public class ToDoHandlerFactory {
     {
         switch (type)
         {
-            case "SQLite": return new SQLiteToDoHandler();
-            case "JSON": return new JSONToDoHandler();
+            case "sqlite": return new SQLiteToDoHandler();
+            case "json": return new JSONToDoHandler();
             default: return new SQLiteToDoHandler();
         }
     }

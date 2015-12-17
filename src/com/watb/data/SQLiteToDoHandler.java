@@ -126,14 +126,14 @@ public class SQLiteToDoHandler implements IToDoHandler
      */
     @Override
     public void changeDoneStatus(long todo_id, boolean status) {
+        int value = (status) ? 1 : 0;
         DBConnection dbc = new DBConnection();
-
         Connection c = null;
         PreparedStatement stmt = null;
 
         try {
             c = dbc.connect();
-            stmt = c.prepareStatement("Update ToDo SET done = " + status + " WHERE id = ?");
+            stmt = c.prepareStatement("Update ToDo SET done = " + value + " WHERE id = ?");
             stmt.setLong(1, todo_id);
             stmt.executeUpdate();
         }
