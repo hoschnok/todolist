@@ -13,4 +13,7 @@ hs_err_pid*
 .idea
 .idea/*
 out
-data
+out/*
+*.json
+*.db
+*.sqlite

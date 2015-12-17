@@ -48,9 +48,9 @@ public class ToDoListApp {
 
         }
 
-//        //erstellt beispielhaft Datensätze in sqlite und json
-//        ToDoListApp app = new ToDoListApp();
-//        app.runTest();
+        //erstellt beispielhaft Datensätze in sqlite und json
+        //ToDoListApp app = new com.watb.controller.ToDoListApp();
+        //app.runTest();
     }
 
     public void runTest() {
