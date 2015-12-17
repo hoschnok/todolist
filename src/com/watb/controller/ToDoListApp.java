@@ -1,4 +1,7 @@
+package com.watb.controller;
+
 import com.watb.data.*;
+import com.watb.view.SwingHandler;
 
 public class ToDoListApp
 {
@@ -13,6 +16,7 @@ public class ToDoListApp
         swingHandler.createFrame();
 
         //erstellt beispielhaft Datensätze in sqlite und json
+        //ToDoListApp app = new com.watb.controller.ToDoListApp();
         //app.runTest();
     }
 

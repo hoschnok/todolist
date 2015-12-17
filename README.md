@@ -1,4 +1,4 @@
-ToDoListApp
+com.watb.controller.ToDoListApp
 ---
 
 **Einrichtung**
@@ -9,6 +9,6 @@ ToDoListApp
 
 **Hinweise**
 
-- main() unter src/ToDoListApp.java
+- main() unter src/com.watb.controller.ToDoListApp.java
 - main() hat die Funktion runTest() zum Erstellen von Beispiel Datensätzen
 - SQLite Tabellen und JSON files zur Datenhaltung liegen unter data und müssen derzeit ggf. vor runTest() entfernt werden

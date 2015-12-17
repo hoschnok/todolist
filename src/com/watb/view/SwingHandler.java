@@ -1,5 +1,6 @@
-package com.watb.data;
+package com.watb.view;
 
+import com.watb.data.JSONToDoHandler;
 import com.watb.model.ToDo;
 import com.watb.model.ToDoList;
 import javax.swing.*;
@@ -52,8 +53,8 @@ public class SwingHandler implements ActionListener {
 
     public void createFrame()
     {
-        // Erzeugung eines neuen JFrame (Hauptfenster) mit dem Titel "ToDoListApp"
-        this.frame = new JFrame("ToDoListApp");
+        // Erzeugung eines neuen JFrame (Hauptfenster) mit dem Titel "com.watb.controller.ToDoListApp"
+        this.frame = new JFrame("com.watb.controller.ToDoListApp");
 
         //beende automatisch die Applikation, wenn das Fenster geschlossen wird
         this.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
