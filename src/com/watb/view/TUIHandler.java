@@ -1,6 +1,6 @@
 package com.watb.view;
 
-import com.watb.data.JSONToDoHandler;
+import com.watb.data.IToDoHandler;
 import com.watb.data.ToDoHandlerFactory;
 import com.watb.model.ToDo;
 import com.watb.model.ToDoList;
@@ -16,13 +16,13 @@ public class TUIHandler {
     Scanner scanner = new Scanner(System.in);
     private static int maxSpaces = 45;
 
-    JSONToDoHandler toDoHandler;
+    IToDoHandler toDoHandler;
 
-    public void init() {
+    public void init(String db) {
 
         ToDoHandlerFactory toDoHandlerFactory = new ToDoHandlerFactory();
 
-        toDoHandler = (JSONToDoHandler) toDoHandlerFactory.getToDoHandler(ToDoHandlerFactory.ToDoHandlerType.JSON);
+        toDoHandler = toDoHandlerFactory.getToDoHandler(db);
         printIntro();
         listTodoLists();
 

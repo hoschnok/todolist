@@ -2,6 +2,7 @@ package com.watb.controller;
 
 import com.watb.data.*;
 import com.watb.view.SwingHandler;
+import com.watb.view.TUIHandler;
 
 /**
  * Note: "ToDos" Schreibweise wird verwendet, weil IntelliJ ansonsten Kommentare als Aufgaben anzeigt.
@@ -18,9 +19,9 @@ public class ToDoListApp {
 
     public static void main(String[] args) {
         // gui or tui
-        String ui = "gui";
+        String ui = "tui";
         //sqlite or json
-        String db = "sqlite";
+        String db = "json";
 
         //Programm-Parameter auswerten (ob null und ob Eingabe anhand der oben definierten Regular Expression korrekt)
         if (ui.equals("")) {
@@ -45,7 +46,8 @@ public class ToDoListApp {
             //Erzeugt den Hauptframe mit Auswahl der derzeitigen ToDos-Listen
             swingHandler.createFrame();
         } else if (ui.equals("tui")) {
-
+            TUIHandler tuiHandler = new TUIHandler();
+            tuiHandler.init(db);
         }
 
         //erstellt beispielhaft Datensätze in sqlite und json
