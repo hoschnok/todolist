@@ -5,32 +5,52 @@ import com.watb.view.SwingHandler;
 
 /**
  * Note: "ToDos" Schreibweise wird verwendet, weil IntelliJ ansonsten Kommentare als Aufgaben anzeigt.
- *
+ * <p/>
  * ToDoListApp ermöglicht das Anlegen von ToDosList und einzelnen ToDos (bzw. Tasks) unterhalt der einzelnen Listen.
  * Jeder task kann dabei als abgeschlossen (done) makiert werden.
- *
+ * <p/>
  * Datenhaltung findet mittels SQLite oder JSON statt.
  * Bedienung erfolgt derzeit über eine mit Swing erzeugte GUI.
  */
-public class ToDoListApp
-{
+public class ToDoListApp {
 
-    public static void main(String[] args)
-    {
-        //Referenz zu der Klasse in der wir uns befinden, da static Notationen wie this nicht zulässt
-        SwingHandler swingHandler = new SwingHandler();
-        //initialisiert den TableModelListener
-        swingHandler.init();
-        //Erzeugt den Hauptframe mit Auswahl der derzeitigen ToDos-Listen
-        swingHandler.createFrame();
+    private final static String REGEX_UI_DECLARATION = "(gui|tui)";
+
+    public static void main(String[] args) {
+        String ui = "";
+
+        //Programm-Parameter auswerten (ob null und ob Eingabe anhand der oben definierten Regular Expression korrekt)
+        if (ui.equals("")) {
+            if (args == null || args.length == 0) {
+                System.out.println(getUsageStatement());
+            } else {
+                if (args[0] != null) {
+                    ui = args[0];
+                    if (!isUiInputCorrect(ui)) {
+                        System.out.println(getUsageStatement());
+                    }
+
+                }
+            }
+        }
+
+        if (ui.equals("gui")) {
+            //Referenz zu der Klasse in der wir uns befinden, da static Notationen wie this nicht zulässt
+            SwingHandler swingHandler = new SwingHandler();
+            //initialisiert den TableModelListener
+            swingHandler.init();
+            //Erzeugt den Hauptframe mit Auswahl der derzeitigen ToDos-Listen
+            swingHandler.createFrame();
+        } else if (ui.equals("tui")) {
+
+        }
 
         //erstellt beispielhaft Datensätze in sqlite und json
         //ToDoListApp app = new com.watb.controller.ToDoListApp();
         //app.runTest();
     }
 
-    public void runTest()
-    {
+    public void runTest() {
         DataTest test = new DataTest();
         /**
          * needs sqlite jdbc driver
@@ -43,6 +63,18 @@ public class ToDoListApp
          * https://code.google.com/p/json-simple/
          */
         test.jsonTest();
+    }
+
+    private static String getUsageStatement() {
+        return "usage: java -jar todolist.jar [gui|tui]";
+    }
+
+    private static boolean isUiInputCorrect(String input) {
+        if (input.matches(REGEX_UI_DECLARATION)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
