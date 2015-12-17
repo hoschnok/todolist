@@ -32,8 +32,11 @@ public class SwingHandler implements ActionListener {
     IToDoHandler toDoHandler;
     TableModelListener tableModelListener;
     JButton addNewList;
+    JButton addNewTask;
     JTextField newList;
+    JTextField newTask;
     JPanel header;
+    JPanel footer;
 
     /**
      * Initialisiert den tableModelListener. Dieser muss während der Laufzeit der JTable hinzugefügt und teilweise
@@ -85,13 +88,14 @@ public class SwingHandler implements ActionListener {
         this.createComboBox();
 
         this.createNewListInput();
+        this.createNewTaskInput();
 
         //erstelle Tabelle mit initial ausgewähltem Wert der ComboBox
         this.createTable();
 
         /* JFrame setSize() und setVisible() möglichst am Ende, sonst eventuell revalidate() bzw. repaint() nötig.
         Wir setzen die Breite und die Höhe unseres Fensters auf jeweils 400 Pixel */
-        this.frame.setSize(800,400);
+        this.frame.setSize(800,275);
 
         // JFrame soll angezeigt werden
         this.frame.setVisible(true);
@@ -113,6 +117,29 @@ public class SwingHandler implements ActionListener {
         //Hinzufügen der Elemente zu dem Header-Bereich
         this.header.add(newList);
         this.header.add(addNewList);
+    }
+
+    /**
+     * Fügt die benötigten Elemente zum Hinzufügen eines neuen Tasks dem Footer hinzu.
+     */
+    public void createNewTaskInput()
+    {
+        //Textfeld zum Hinzufügen neuer ToDos-Listen
+        this.newTask = new JTextField();
+        //Größe an Elemente JComboBox und JButton in der Reihe anpassen
+        this.newTask.setPreferredSize(new Dimension(200, 30));
+        //Button zum hinzufügen der ToDos-Liste
+        this.addNewTask = new JButton("Aufgabe hinzufügen");
+        //actionListener des Buttons wieder mit Verweis auf dieses Objekt - permformed action prüft dann das Element
+        this.addNewTask.addActionListener(this);
+
+        //JTextField und JButton werden Panel hinzugefügt - FlowLaylout, damit die Inhalte linksbündig angezeigt werden
+        this.footer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        //Hinzufügen der Elemente zu dem Header-Bereich
+        this.footer.add(this.newTask);
+        this.footer.add(this.addNewTask);
+        this.frame.getContentPane().add(footer, BorderLayout.PAGE_END);
     }
 
     /**
@@ -141,6 +168,34 @@ public class SwingHandler implements ActionListener {
 
         //Panel hinzufügen (PAGE_START, PAGE_END, LINE_START, LINE_END, CENTER)
         this.frame.getContentPane().add(header, BorderLayout.PAGE_START);
+    }
+
+    /**
+     * Erneuert die ComboBox, Actionlistener muss anfangs entfernt und am Ende wieder zugefügt werden.
+     * @param select int ist dieser Parameter gesetzt wird der Index der ComboBox nach dem Refresh gesetzt.
+     */
+    public void refreshComboBox(int select)
+    {
+        //Actionlistener temporär entfernen, da sonst jedes mal triggert
+        this.toDoListComboBox.removeActionListener(this);
+        //Hole alle Listen aus den JSON files, um diese in einem DropDown darstellen zu können
+        this.toDoLists = this.toDoHandler.getLists();
+
+        this.toDoListComboBox.removeAllItems();
+
+        for(ToDoList str : this.toDoLists) {
+            this.toDoListComboBox.addItem(str);
+        }
+        //re-enable action listener
+        this.toDoListComboBox.addActionListener(this);
+        if (select >= 0){
+            this.toDoListComboBox.setSelectedIndex(select);
+        } else {
+            //neue Anzahl von Listen holen
+            int count = this.toDoListComboBox.getItemCount();
+            //neu erstellte Liste auswählen
+            this.toDoListComboBox.setSelectedIndex(count - 1);
+        }
     }
 
     /**
@@ -278,10 +333,33 @@ public class SwingHandler implements ActionListener {
     public void actionPerformed (ActionEvent ae){
         //Prüfe welches Element das Event erzeugt hat
         if(ae.getSource() == this.toDoListComboBox){
-            //ernuere die Daten der Tabelle, wenn eine andere ToDos ausgewählt wurden
+            //erneuere die Daten der Tabelle, wenn eine andere ToDos ausgewählt wurden
             this.refreshTable();
         }else if(ae.getSource() == this.addNewList){
-            System.out.println("x");
+            //hole den Aktuellen Wert für die neue ToDosListe
+            String input = this.newList.getText();
+            //speicher den neuen Wert in der jeweiligen DatenBank
+            this.toDoHandler.saveToDoList(input);
+            //setze das textfeld zurück
+            this.newList.setText("");
+            //erneuere die ComboBox mit der neuen Liste
+            this.refreshComboBox(-1);
+        } else if(ae.getSource() == this.addNewTask){
+            String input = this.newTask.getText();
+            //aktuell ausgewählte Liste
+            ToDoList selected = (ToDoList) this.toDoListComboBox.getSelectedItem();
+            //ID der ausgewählten Liste
+            long id = selected.getId();
+            //speichern des neuen ToDos zu der Liste
+            this.toDoHandler.saveToDo(id, input);
+            //setze das textfeld zurück
+            this.newTask.setText("");
+            //hole aktuell ausgewählten index, damit wir diesen nach neuem Befüllen der Combobox neu setzen können
+            int index = this.toDoListComboBox.getSelectedIndex();
+            //ComboBox erneuern
+            this.refreshComboBox(index);
+            //Tabelle erneuern
+            this.refreshTable();
         }
     }
 }
