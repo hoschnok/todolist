@@ -2,6 +2,7 @@ package com.watb.controller;
 
 import com.watb.data.*;
 import com.watb.view.SwingHandler;
+import com.watb.view.TUIHandler;
 
 /**
  * Note: "ToDos" Schreibweise wird verwendet, weil IntelliJ ansonsten Kommentare als Aufgaben anzeigt.
@@ -15,12 +16,13 @@ import com.watb.view.SwingHandler;
 public class ToDoListApp {
 
     private final static String REGEX_UI_DECLARATION = "(gui|tui)";
+    private final static String REGEX_DB_DECLARATION = "(json|sqlite)";
 
     public static void main(String[] args) {
         // gui or tui
-        String ui = "gui";
+        String ui = "tui";
         //sqlite or json
-        String db = "json";
+        String db = "sqlite";
 
         //Programm-Parameter auswerten (ob null und ob Eingabe anhand der oben definierten Regular Expression korrekt)
         if (ui.equals("")) {
@@ -32,7 +34,12 @@ public class ToDoListApp {
                     if (!isUiInputCorrect(ui)) {
                         System.out.println(getUsageStatement());
                     }
-
+                }
+                if(args[1] != null){
+                    db = args[1];
+                    if(!isDbInputCorrect(db)){
+                        System.out.println(getUsageStatement());
+                    }
                 }
             }
         }
@@ -45,7 +52,8 @@ public class ToDoListApp {
             //Erzeugt den Hauptframe mit Auswahl der derzeitigen ToDos-Listen
             swingHandler.createFrame();
         } else if (ui.equals("tui")) {
-
+            TUIHandler tuiHandler = new TUIHandler();
+            tuiHandler.init(db);
         }
 
 //        //erstellt beispielhaft Datensätze in sqlite und json
@@ -69,7 +77,7 @@ public class ToDoListApp {
     }
 
     private static String getUsageStatement() {
-        return "usage: java -jar todolist.jar [gui|tui]";
+        return "usage: java -jar todolist.jar [gui|tui] [json|sqlite]";
     }
 
     private static boolean isUiInputCorrect(String input) {
@@ -80,4 +88,11 @@ public class ToDoListApp {
         }
     }
 
+    private static boolean isDbInputCorrect(String input) {
+        if (input.matches(REGEX_DB_DECLARATION)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
